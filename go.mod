@@ -2,10 +2,7 @@ module github.com/WinnerSoftLab/cronexpr
 
 go 1.20
 
-require (
-	github.com/WinnerSoftLab/cronexpr v0.0.2
-	github.com/stretchr/testify v1.8.4
-)
+require github.com/stretchr/testify v1.8.4
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
