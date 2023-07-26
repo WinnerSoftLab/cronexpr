@@ -1,9 +1,9 @@
-module tidy
+module github.com/WinnerSoftLab/cronexpr
 
 go 1.20
 
 require (
-	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
+	github.com/WinnerSoftLab/cronexpr v0.0.2
 	github.com/stretchr/testify v1.8.4
 )
 
