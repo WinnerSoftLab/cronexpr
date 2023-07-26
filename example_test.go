@@ -300,6 +300,17 @@ func TestSystemdTimers(t *testing.T) {
 				time.Date(2019, time.January, 4, 12, 0, 0, 0, loc),
 			},
 		},
+		{
+			"Leap years",
+			"*-02-29 01:00:00",
+			time.Date(2019, time.January, 4, 1, 0, 0, 0, loc),
+			[]time.Time{
+				time.Date(2020, time.February, 29, 1, 0, 0, 0, loc),
+				time.Date(2024, time.February, 29, 1, 0, 0, 0, loc),
+				time.Date(2028, time.February, 29, 1, 0, 0, 0, loc),
+				time.Date(2032, time.February, 29, 1, 0, 0, 0, loc),
+			},
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
