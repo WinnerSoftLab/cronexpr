@@ -201,7 +201,7 @@ func ParseSystemd(systemdLine string) (*Expression, error) {
 		field += 1
 
 		// month field
-		if len(indices)-field > 0 {
+		if len(indices)-field >= 0 {
 			err = expr.monthFieldHandler(dateString[indices[len(indices)-field][0]:indices[len(indices)-field][1]])
 			if err != nil {
 				return nil, err
@@ -212,8 +212,12 @@ func ParseSystemd(systemdLine string) (*Expression, error) {
 		}
 
 		// year field
-		if len(indices)-field > 0 {
-			err = expr.yearFieldHandler(dateString[indices[len(indices)-field][0]:indices[len(indices)-field][1]])
+		if len(indices)-field >= 0 {
+			yearString := dateString[indices[len(indices)-field][0]:indices[len(indices)-field][1]]
+			if len(yearString) == 2 {
+				yearString = "20" + yearString
+			}
+			err = expr.yearFieldHandler(yearString)
 			if err != nil {
 				return nil, err
 			}
@@ -255,15 +259,27 @@ func ParseSystemd(systemdLine string) (*Expression, error) {
 				return nil, err
 			}
 		} else {
-			expr.secondList = secondDescriptor.defaultList
+			err = expr.secondFieldHandler("00")
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		fieldI++
 	} else {
 		// time *
-		expr.secondList = secondDescriptor.defaultList
-		expr.minuteList = minuteDescriptor.defaultList
-		expr.hourList = hourDescriptor.defaultList
+		err = expr.secondFieldHandler("00")
+		if err != nil {
+			return nil, err
+		}
+		err = expr.minuteFieldHandler("00")
+		if err != nil {
+			return nil, err
+		}
+		err = expr.hourFieldHandler("00")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	if fieldI < fieldCount {

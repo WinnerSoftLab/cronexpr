@@ -188,7 +188,7 @@ var (
 	layoutRange                   = `^(%value%)-(%value%)$`
 	layoutRangeSystemd            = `^(%value%)\.\.(%value%)$`
 	layoutWildcardAndInterval     = `^\*/(\d+)$`
-	layoutValueAndInterval        = `^(%value%)/(\d)+$`
+	layoutValueAndInterval        = `^(%value%)/(\d+)$`
 	layoutRangeAndInterval        = `^(%value%)-(%value%)/(\d+)$`
 	layoutRangeAndIntervalSystemd = `^(%value%)\.\.(%value%)/(\d+)$`
 	layoutLastDom                 = `^l$`
