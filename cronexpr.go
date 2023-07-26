@@ -29,7 +29,6 @@ import (
 // <https://github.com/gorhill/cronexpr#implementation>
 type Expression struct {
 	expression             string
-	indices                [][]int
 	secondList             []int
 	minuteList             []int
 	hourList               []int
@@ -164,8 +163,8 @@ func ParseSystemd(systemdLine string) (*Expression, error) {
 		return nil, fmt.Errorf("invalid expression, %s", err)
 	}
 
-	expr.indices = fieldFinder.FindAllStringIndex(expr.expression, -1)
-	fieldCount := len(expr.indices)
+	indices := fieldFinder.FindAllStringIndex(expr.expression, -1)
+	fieldCount := len(indices)
 	fieldI := 0
 	var err error
 
@@ -174,9 +173,9 @@ func ParseSystemd(systemdLine string) (*Expression, error) {
 	}
 
 	// Try parse weekday field
-	if expr.validateField(fieldI, WeekDayField) {
+	if expr.validateField(fieldI, WeekDayField, indices) {
 		// parse weekday
-		err = expr.dowFieldHandler(expr.expression[expr.indices[fieldI][0]:expr.indices[fieldI][1]])
+		err = expr.dowFieldHandler(expr.expression[indices[fieldI][0]:indices[fieldI][1]])
 		if err != nil {
 			return nil, err
 		}
@@ -187,22 +186,23 @@ func ParseSystemd(systemdLine string) (*Expression, error) {
 	}
 
 	// Try parse date field
-	if expr.validateField(fieldI, DayField) {
+	if expr.validateField(fieldI, DayField, indices) {
 		// parse date
 		field := 1
-		dateString := expr.expression[expr.indices[fieldI][0]:expr.indices[fieldI][1]]
-		indices := entryDateFinder.FindAllStringIndex(dateString, -1)
+		dateString := expr.expression[indices[fieldI][0]:indices[fieldI][1]]
+
+		DateIndices := entryDateFinder.FindAllStringIndex(dateString, -1)
 
 		// day of month field
-		err = expr.domFieldHandler(dateString[indices[len(indices)-field][0]:indices[len(indices)-field][1]])
+		err = expr.domFieldHandler(dateString[DateIndices[len(DateIndices)-field][0]:DateIndices[len(DateIndices)-field][1]])
 		if err != nil {
 			return nil, err
 		}
 		field += 1
 
 		// month field
-		if len(indices)-field >= 0 {
-			err = expr.monthFieldHandler(dateString[indices[len(indices)-field][0]:indices[len(indices)-field][1]])
+		if len(DateIndices)-field >= 0 {
+			err = expr.monthFieldHandler(dateString[DateIndices[len(DateIndices)-field][0]:DateIndices[len(DateIndices)-field][1]])
 			if err != nil {
 				return nil, err
 			}
@@ -212,8 +212,8 @@ func ParseSystemd(systemdLine string) (*Expression, error) {
 		}
 
 		// year field
-		if len(indices)-field >= 0 {
-			yearString := dateString[indices[len(indices)-field][0]:indices[len(indices)-field][1]]
+		if len(DateIndices)-field >= 0 {
+			yearString := dateString[DateIndices[len(DateIndices)-field][0]:DateIndices[len(DateIndices)-field][1]]
 			if len(yearString) == 2 {
 				yearString = "20" + yearString
 			}
@@ -232,29 +232,29 @@ func ParseSystemd(systemdLine string) (*Expression, error) {
 	}
 
 	// Try parse date time
-	if expr.validateField(fieldI, TimeField) {
+	if expr.validateField(fieldI, TimeField, indices) {
 		// parse time
 		field := 0
-		timeString := expr.expression[expr.indices[fieldI][0]:expr.indices[fieldI][1]]
-		indices := entryTimeFinder.FindAllStringIndex(timeString, -1)
+		timeString := expr.expression[indices[fieldI][0]:indices[fieldI][1]]
+		TimeIndices := entryTimeFinder.FindAllStringIndex(timeString, -1)
 
 		// hour field
-		err = expr.hourFieldHandler(timeString[indices[field][0]:indices[field][1]])
+		err = expr.hourFieldHandler(timeString[TimeIndices[field][0]:TimeIndices[field][1]])
 		if err != nil {
 			return nil, err
 		}
 		field += 1
 
 		// minute field
-		err = expr.minuteFieldHandler(timeString[indices[field][0]:indices[field][1]])
+		err = expr.minuteFieldHandler(timeString[TimeIndices[field][0]:TimeIndices[field][1]])
 		if err != nil {
 			return nil, err
 		}
 		field += 1
 
 		// seconds field
-		if field < len(indices) {
-			err = expr.secondFieldHandler(timeString[indices[field][0]:indices[field][1]])
+		if field < len(TimeIndices) {
+			err = expr.secondFieldHandler(timeString[TimeIndices[field][0]:TimeIndices[field][1]])
 			if err != nil {
 				return nil, err
 			}
@@ -283,9 +283,9 @@ func ParseSystemd(systemdLine string) (*Expression, error) {
 	}
 
 	if fieldI < fieldCount {
-		if expr.expression[expr.indices[fieldI][0]:expr.indices[fieldI][1]] != "" {
+		if expr.expression[indices[fieldI][0]:indices[fieldI][1]] != "" {
 			// try parse timezone
-			expr.timeZone = time.FixedZone(expr.expression[expr.indices[fieldI][0]:expr.indices[fieldI][1]], 0)
+			expr.timeZone = time.FixedZone(expr.expression[indices[fieldI][0]:indices[fieldI][1]], 0)
 		}
 	}
 	return &expr, nil

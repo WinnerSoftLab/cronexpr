@@ -251,13 +251,13 @@ func (expr *Expression) normalyzeSystemd() error {
 
 /******************************************************************************/
 
-func (expr *Expression) validateField(field int, sigType FieldType) bool {
-	fieldCount := len(expr.indices)
+func (expr *Expression) validateField(field int, sigType FieldType, indices [][]int) bool {
+	fieldCount := len(indices)
 	if field >= fieldCount {
 		return false
 	}
 	weekdayFieldRx := regexp.MustCompile(systemdFieldsSig[sigType])
-	if weekdayFieldRx.MatchString(expr.expression[expr.indices[field][0]:expr.indices[field][1]]) {
+	if weekdayFieldRx.MatchString(expr.expression[indices[field][0]:indices[field][1]]) {
 		return true
 	}
 	return false
