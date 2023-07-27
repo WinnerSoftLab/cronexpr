@@ -18,6 +18,7 @@ package cronexpr
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
 	"time"
@@ -263,15 +264,14 @@ var systemdNormTests = []systemdNormTest{
 }
 
 func TestParseSystemd(t *testing.T) {
+	var err error
+	initTime := time.Date(2001, time.January, 4, 1, 0, 0, 0, time.UTC)
 	for _, test := range systemdNormTests {
-		_, err := ParseSystemd(test.denormExp)
-		if err != nil {
-			t.Errorf(`Denorm Parse("%s") returned "%s"`, test.denormExp, err.Error())
-		}
-		_, err = ParseSystemd(test.normExp)
-		if err != nil {
-			t.Errorf(`Norm Parse("%s") returned "%s"`, test.denormExp, err.Error())
-		}
+		denorm := MustParseSystemd(test.denormExp)
+		norm := MustParseSystemd(test.normExp)
+		assert.NoError(t, err)
+		assert.Equalf(t, denorm.Next(initTime), norm.Next(initTime), "next time of %v", initTime)
+
 	}
 }
 
